@@ -226,6 +226,15 @@ didCompleteWithError:(NSError *)error
 
     NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
                              (long)httpResponse.statusCode];
+    if (error == nil) {
+        NSError *wrappedError = [NSError errorWithDomain:RLMAppErrorDomain
+                                                code:RLMAppErrorHttpRequestFailed
+                                            userInfo:@{NSLocalizedDescriptionKey: errorStatus,
+                                                RLMHTTPStatusCodeKey: @(httpResponse.statusCode),
+                                                       NSURLErrorFailingURLErrorKey: task.currentRequest.URL}];
+                                                       
+        return [_subscriber didCloseWithError:wrappedError];
+    }
     NSError *wrappedError = [NSError errorWithDomain:RLMAppErrorDomain
                                                 code:RLMAppErrorHttpRequestFailed
                                             userInfo:@{NSLocalizedDescriptionKey: errorStatus,
